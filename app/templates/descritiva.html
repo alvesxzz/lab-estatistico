@@ -1,0 +1,99 @@
+{% extends "base.html" %}
+{% block titulo %}Estatística Descritiva{% endblock %}
+{% block conteudo %}
+<h1>📊 Módulo 2 — Estatística Descritiva Interativa</h1>
+
+<form class="form-controles" method="get">
+  <div>
+    <label for="coluna">Escolha uma variável</label>
+    <select name="coluna" id="coluna" onchange="this.form.submit()">
+      <optgroup label="Numéricas">
+        {% for c in colunas_numericas %}
+        <option value="{{ c }}" {% if c == coluna_selecionada %}selected{% endif %}>{{ c }}</option>
+        {% endfor %}
+      </optgroup>
+      <optgroup label="Categóricas">
+        {% for c in colunas_categoricas %}
+        <option value="{{ c }}" {% if c == coluna_selecionada %}selected{% endif %}>{{ c }}</option>
+        {% endfor %}
+      </optgroup>
+    </select>
+  </div>
+  <button type="submit">Atualizar</button>
+</form>
+
+{% if tipo == "numerica" %}
+<div class="cartao">
+  <h2>Medidas — {{ coluna_selecionada }} <span class="badge">numérica</span></h2>
+  <div class="grade-3">
+    <div class="stat-tile"><div class="rotulo">n</div><div class="valor">{{ estatisticas.n }}</div></div>
+    <div class="stat-tile"><div class="rotulo">Média</div><div class="valor">{{ "%.4f"|format(estatisticas.media) }}</div></div>
+    <div class="stat-tile"><div class="rotulo">Mediana</div><div class="valor">{{ "%.4f"|format(estatisticas.mediana) }}</div></div>
+    <div class="stat-tile"><div class="rotulo">Moda</div><div class="valor">{{ estatisticas.moda[:5]|join(", ") }}{% if estatisticas.moda|length > 5 %}…{% endif %}</div></div>
+    <div class="stat-tile"><div class="rotulo">Amplitude</div><div class="valor">{{ "%.4f"|format(estatisticas.amplitude) }}</div></div>
+    <div class="stat-tile"><div class="rotulo">Variância amostral</div><div class="valor">{{ "%.4f"|format(estatisticas.variancia_amostral) }}</div></div>
+    <div class="stat-tile"><div class="rotulo">Desvio padrão amostral</div><div class="valor">{{ "%.4f"|format(estatisticas.desvio_padrao_amostral) }}</div></div>
+    <div class="stat-tile"><div class="rotulo">Variância populacional</div><div class="valor">{{ "%.4f"|format(estatisticas.variancia_populacional) }}</div></div>
+    <div class="stat-tile"><div class="rotulo">Desvio padrão populacional</div><div class="valor">{{ "%.4f"|format(estatisticas.desvio_padrao_populacional) }}</div></div>
+    <div class="stat-tile"><div class="rotulo">Coef. de variação</div><div class="valor">{{ "%.2f"|format(estatisticas.cv) }}%</div></div>
+    <div class="stat-tile"><div class="rotulo">Q1 / Q2 / Q3</div><div class="valor">{{ "%.2f"|format(estatisticas.q1) }} / {{ "%.2f"|format(estatisticas.q2) }} / {{ "%.2f"|format(estatisticas.q3) }}</div></div>
+    <div class="stat-tile"><div class="rotulo">IQR</div><div class="valor">{{ "%.4f"|format(estatisticas.iqr) }}</div></div>
+  </div>
+
+  <p class="interpretacao">{{ interpretacao_assimetria }}</p>
+  <p class="interpretacao">{{ interpretacao_outliers }}
+    Limites da regra do IQR: [{{ "%.3f"|format(limite_inferior) }}, {{ "%.3f"|format(limite_superior) }}].
+    {% if outliers_exemplos %}Exemplos: {{ outliers_exemplos|join(", ") }}{% if qtd_outliers > 15 %} …{% endif %}{% endif %}
+  </p>
+</div>
+
+<div class="grade-2">
+  <div class="cartao"><img class="grafico" src="data:image/png;base64,{{ grafico_histograma }}" alt="Histograma"></div>
+  <div class="cartao"><img class="grafico" src="data:image/png;base64,{{ grafico_boxplot }}" alt="Boxplot"></div>
+</div>
+
+<div class="cartao">
+  <h2>Tabela de frequências (classes — regra de Sturges)</h2>
+  <table>
+    <thead><tr><th>Classe</th><th>Freq. absoluta</th><th>Freq. relativa (%)</th><th>Freq. acumulada</th></tr></thead>
+    <tbody>
+      {% for linha in tabela_frequencias %}
+      <tr>
+        <td>{{ linha.classe }}</td>
+        <td>{{ linha.freq_absoluta }}</td>
+        <td>{{ "%.2f"|format(linha.freq_relativa) }}</td>
+        <td>{{ linha.freq_acumulada }}</td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+
+{% elif tipo == "categorica" %}
+<div class="cartao">
+  <h2>Resumo — {{ coluna_selecionada }} <span class="badge">categórica</span></h2>
+  <div class="grade-3">
+    <div class="stat-tile"><div class="rotulo">n</div><div class="valor">{{ n }}</div></div>
+    <div class="stat-tile"><div class="rotulo">Categorias distintas</div><div class="valor">{{ n_categorias }}</div></div>
+    <div class="stat-tile"><div class="rotulo">Categoria mais frequente</div><div class="valor">{{ tabela_frequencias_cat[0].categoria }}</div></div>
+  </div>
+</div>
+
+<div class="grade-2">
+  <div class="cartao"><img class="grafico" src="data:image/png;base64,{{ grafico_barras }}" alt="Gráfico de barras"></div>
+  <div class="cartao"><img class="grafico" src="data:image/png;base64,{{ grafico_pizza }}" alt="Gráfico de pizza"></div>
+</div>
+
+<div class="cartao">
+  <h2>Tabela de frequências</h2>
+  <table>
+    <thead><tr><th>Categoria</th><th>Freq. absoluta</th><th>Freq. relativa (%)</th></tr></thead>
+    <tbody>
+      {% for linha in tabela_frequencias_cat %}
+      <tr><td>{{ linha.categoria }}</td><td>{{ linha.freq_absoluta }}</td><td>{{ "%.2f"|format(linha.freq_relativa) }}</td></tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+{% endif %}
+{% endblock %}

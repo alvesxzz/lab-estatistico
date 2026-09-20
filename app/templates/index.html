@@ -1,0 +1,47 @@
+{% extends "base.html" %}
+{% block titulo %}Visão Geral — Laboratório Estatístico{% endblock %}
+{% block conteudo %}
+<h1>Laboratório Estatístico Interativo</h1>
+<p>Explore um dataset real por meio de estatística descritiva, simulação de Monte Carlo,
+distribuições teóricas e regressão linear — com todo o núcleo matemático implementado do
+zero e validado contra NumPy/SciPy (veja <code>tests/test_minhastats.py</code>).</p>
+
+<div class="grade-3">
+  <div class="stat-tile"><div class="rotulo">Registros</div><div class="valor">{{ n_linhas }}</div></div>
+  <div class="stat-tile"><div class="rotulo">Colunas</div><div class="valor">{{ n_colunas }}</div></div>
+  <div class="stat-tile"><div class="rotulo">Variáveis numéricas / categóricas</div>
+    <div class="valor">{{ colunas_numericas|length }} / {{ colunas_categoricas|length }}</div></div>
+</div>
+
+<div class="cartao">
+  <h2>Colunas do dataset</h2>
+  <p>
+    <strong>Numéricas:</strong> {{ colunas_numericas|join(", ") }}<br>
+    <strong>Categóricas:</strong> {{ colunas_categoricas|join(", ") }}
+  </p>
+</div>
+
+<div class="cartao">
+  <h2>Amostra dos dados (8 primeiras linhas)</h2>
+  <div style="overflow-x:auto;">
+  <table>
+    <thead><tr>{% for c in colunas %}<th>{{ c }}</th>{% endfor %}</tr></thead>
+    <tbody>
+      {% for linha in amostra %}
+      <tr>{% for c in colunas %}<td>{{ linha[c] }}</td>{% endfor %}</tr>
+      {% endfor %}
+    </tbody>
+  </table>
+  </div>
+</div>
+
+<div class="cartao">
+  <h2>Módulos disponíveis</h2>
+  <ul>
+    <li><a href="{{ url_for('descritiva') }}">📊 Estatística Descritiva</a> — tabela de frequências, medidas de tendência central/dispersão, outliers (IQR), histogramas/boxplot/barras/pizza.</li>
+    <li><a href="{{ url_for('simulacao') }}">🎲 Probabilidade e Simulação</a> — Lei dos Grandes Números e Teorema Central do Limite via Monte Carlo.</li>
+    <li><a href="{{ url_for('distribuicoes') }}">📐 Distribuições Teóricas</a> — ajuste de Normal e outra distribuição candidata aos dados.</li>
+    <li><a href="{{ url_for('regressao') }}">📈 Correlação e Regressão Linear</a> — dispersão, reta de mínimos quadrados, R² e predição interativa.</li>
+  </ul>
+</div>
+{% endblock %}

@@ -1,0 +1,43 @@
+{% extends "base.html" %}
+{% block titulo %}Distribuições Teóricas{% endblock %}
+{% block conteudo %}
+<h1>📐 Módulo 4 — Distribuições Teóricas</h1>
+<p>Escolha uma variável numérica e uma segunda distribuição candidata para comparar
+com a Normal ajustada aos dados. Os parâmetros de cada distribuição são estimados
+diretamente a partir da variável escolhida.</p>
+
+<form class="form-controles" method="get">
+  <div>
+    <label for="coluna">Variável numérica</label>
+    <select id="coluna" name="coluna">
+      {% for c in colunas_numericas %}
+      <option value="{{ c }}" {% if c == coluna_selecionada %}selected{% endif %}>{{ c }}</option>
+      {% endfor %}
+    </select>
+  </div>
+  <div>
+    <label for="distribuicao">Segunda distribuição candidata</label>
+    <select id="distribuicao" name="distribuicao">
+      {% for chave, nome in distribuicoes_disponiveis.items() %}
+      <option value="{{ chave }}" {% if chave == distribuicao_selecionada %}selected{% endif %}>{{ nome }}</option>
+      {% endfor %}
+    </select>
+  </div>
+  <button type="submit">Atualizar</button>
+</form>
+
+{% if grafico_distribuicao %}
+<div class="cartao">
+  <img class="grafico" src="data:image/png;base64,{{ grafico_distribuicao }}" alt="Ajuste de distribuições">
+  <p class="interpretacao">
+    Normal ajustada com μ = {{ "%.4f"|format(media_amostra) }} e σ = {{ "%.4f"|format(dp_amostra) }}
+    (estimados pela própria biblioteca <code>minhastats.py</code>). {{ parametros_texto }}
+  </p>
+  <p class="interpretacao">Compare visualmente qual curva acompanha melhor o formato do
+    histograma: distribuições diferentes servem para naturezas diferentes de variável —
+    a Poisson e a Binomial são mais adequadas a variáveis de contagem, a Exponencial a
+    tempos de espera/variáveis assimétricas positivas, e a Uniforme quando não há
+    concentração em nenhuma faixa de valores.</p>
+</div>
+{% endif %}
+{% endblock %}

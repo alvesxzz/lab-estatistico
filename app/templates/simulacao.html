@@ -1,0 +1,73 @@
+{% extends "base.html" %}
+{% block titulo %}Probabilidade e Simulação{% endblock %}
+{% block conteudo %}
+<h1>🎲 Módulo 3 — Probabilidade e Simulação (Monte Carlo)</h1>
+
+<div class="cartao">
+  <h2>(a) Lei dos Grandes Números</h2>
+  <p>Simulamos lançamentos de uma moeda com probabilidade de sucesso <code>p</code> e
+  acompanhamos a frequência relativa acumulada. Conforme o número de lançamentos cresce,
+  ela converge para <code>p</code>.</p>
+
+  <form class="form-controles" method="get">
+    <input type="hidden" name="coluna_clt" value="{{ coluna_clt or '' }}">
+    <input type="hidden" name="tamanho_amostra" value="{{ tamanho_amostra }}">
+    <input type="hidden" name="n_repeticoes" value="{{ n_repeticoes }}">
+    <input type="hidden" name="seed_clt" value="{{ seed_clt }}">
+    <div><label for="n_max">Nº de lançamentos</label>
+      <input type="number" id="n_max" name="n_max" min="10" max="20000" value="{{ n_max }}"></div>
+    <div><label for="p">Probabilidade (p)</label>
+      <input type="number" id="p" name="p" min="0.01" max="0.99" step="0.01" value="{{ p_moeda }}"></div>
+    <div><label for="seed_lgn">Semente aleatória</label>
+      <input type="number" id="seed_lgn" name="seed_lgn" value="{{ seed_lgn }}"></div>
+    <button type="submit">Simular</button>
+  </form>
+
+  <img class="grafico" src="data:image/png;base64,{{ grafico_lgn }}" alt="Gráfico Lei dos Grandes Números">
+  <p class="interpretacao">Após {{ n_max }} lançamentos, a frequência relativa observada foi
+    {{ "%.4f"|format(freq_final_lgn) }}, próxima da probabilidade teórica p = {{ p_moeda }} —
+    ilustrando a Lei dos Grandes Números.</p>
+</div>
+
+<div class="cartao">
+  <h2>(b) Teorema Central do Limite</h2>
+  <p>Sorteamos repetidamente amostras (com reposição) de uma variável numérica real do
+  dataset e calculamos a média de cada amostra. A distribuição dessas médias se aproxima
+  de uma Normal conforme o tamanho da amostra cresce — mesmo que a variável original não
+  seja normal.</p>
+
+  <form class="form-controles" method="get">
+    <input type="hidden" name="n_max" value="{{ n_max }}">
+    <input type="hidden" name="p" value="{{ p_moeda }}">
+    <input type="hidden" name="seed_lgn" value="{{ seed_lgn }}">
+    <div><label for="coluna_clt">Variável do dataset</label>
+      <select id="coluna_clt" name="coluna_clt">
+        {% for c in colunas_numericas %}
+        <option value="{{ c }}" {% if c == coluna_clt %}selected{% endif %}>{{ c }}</option>
+        {% endfor %}
+      </select></div>
+    <div><label for="tamanho_amostra">Tamanho de cada amostra (n)</label>
+      <input type="number" id="tamanho_amostra" name="tamanho_amostra" min="1" max="2000" value="{{ tamanho_amostra }}"></div>
+    <div><label for="n_repeticoes">Nº de repetições</label>
+      <input type="number" id="n_repeticoes" name="n_repeticoes" min="10" max="20000" value="{{ n_repeticoes }}"></div>
+    <div><label for="seed_clt">Semente aleatória</label>
+      <input type="number" id="seed_clt" name="seed_clt" value="{{ seed_clt }}"></div>
+    <button type="submit">Simular</button>
+  </form>
+
+  {% if grafico_clt %}
+  <img class="grafico" src="data:image/png;base64,{{ grafico_clt }}" alt="Gráfico Teorema Central do Limite">
+  <div class="grade-3">
+    <div class="stat-tile"><div class="rotulo">Média da população</div><div class="valor">{{ "%.4f"|format(media_populacional) }}</div></div>
+    <div class="stat-tile"><div class="rotulo">Erro padrão teórico (σ/√n)</div><div class="valor">{{ "%.4f"|format(erro_padrao_teorico) }}</div></div>
+    <div class="stat-tile"><div class="rotulo">Desvio padrão das médias simuladas</div><div class="valor">{{ "%.4f"|format(desvio_das_medias) }}</div></div>
+  </div>
+  <p class="interpretacao">Com {{ n_repeticoes }} repetições e amostras de tamanho {{ tamanho_amostra }},
+    a média das médias amostrais ({{ "%.4f"|format(media_das_medias) }}) fica muito próxima da média
+    populacional ({{ "%.4f"|format(media_populacional) }}), e o desvio padrão das médias simuladas
+    ({{ "%.4f"|format(desvio_das_medias) }}) se aproxima do erro padrão teórico previsto pelo TCL
+    ({{ "%.4f"|format(erro_padrao_teorico) }} = σ/√n). Aumente o tamanho da amostra e observe o
+    histograma ficar cada vez mais próximo da curva Normal.</p>
+  {% endif %}
+</div>
+{% endblock %}

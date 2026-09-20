@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>{% block titulo %}Laboratório Estatístico Interativo{% endblock %}</title>
+<link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+<header class="topo">
+  <div class="marca">📊 Laboratório Estatístico Interativo</div>
+  <nav class="menu">
+    <a href="{{ url_for('home') }}">Visão Geral</a>
+    <a href="{{ url_for('descritiva') }}">Descritiva</a>
+    <a href="{{ url_for('simulacao') }}">Simulação</a>
+    <a href="{{ url_for('distribuicoes') }}">Distribuições</a>
+    <a href="{{ url_for('regressao') }}">Regressão</a>
+  </nav>
+</header>
+<main class="conteudo">
+  {% block conteudo %}{% endblock %}
+</main>
+<footer class="rodape">
+  Núcleo estatístico implementado do zero (core/minhastats.py) e validado contra NumPy/SciPy.
+</footer>
+</body>
+</html>

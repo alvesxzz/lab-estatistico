@@ -1,0 +1,67 @@
+{% extends "base.html" %}
+{% block titulo %}Correlação e Regressão{% endblock %}
+{% block conteudo %}
+<h1>📈 Módulo 5 — Correlação e Regressão Linear</h1>
+
+<form class="form-controles" method="get">
+  <div>
+    <label for="var_x">Variável X (independente)</label>
+    <select id="var_x" name="var_x">
+      {% for c in colunas_numericas %}
+      <option value="{{ c }}" {% if c == var_x %}selected{% endif %}>{{ c }}</option>
+      {% endfor %}
+    </select>
+  </div>
+  <div>
+    <label for="var_y">Variável Y (dependente)</label>
+    <select id="var_y" name="var_y">
+      {% for c in colunas_numericas %}
+      <option value="{{ c }}" {% if c == var_y %}selected{% endif %}>{{ c }}</option>
+      {% endfor %}
+    </select>
+  </div>
+  <button type="submit">Atualizar</button>
+</form>
+
+{% if grafico_regressao %}
+<div class="cartao">
+  <img class="grafico" src="data:image/png;base64,{{ grafico_regressao }}" alt="Dispersão e reta de regressão">
+
+  <div class="grade-3">
+    <div class="stat-tile"><div class="rotulo">n (pares válidos)</div><div class="valor">{{ n_pares }}</div></div>
+    <div class="stat-tile"><div class="rotulo">Covariância</div><div class="valor">{{ "%.4f"|format(covariancia) }}</div></div>
+    <div class="stat-tile"><div class="rotulo">Correlação (Pearson)</div><div class="valor">{{ "%.4f"|format(correlacao) }}</div></div>
+    <div class="stat-tile"><div class="rotulo">R²</div><div class="valor">{{ "%.4f"|format(r2) }}</div></div>
+    <div class="stat-tile"><div class="rotulo">Intercepto (b0)</div><div class="valor">{{ "%.4f"|format(b0) }}</div></div>
+    <div class="stat-tile"><div class="rotulo">Inclinação (b1)</div><div class="valor">{{ "%.4f"|format(b1) }}</div></div>
+  </div>
+
+  <p class="interpretacao"><strong>Equação da reta:</strong> {{ equacao }}<br>
+  Para cada unidade adicional em <strong>{{ var_x }}</strong>, o modelo estima uma variação de
+  {{ "%.4f"|format(b1) }} em <strong>{{ var_y }}</strong>. O R² indica que
+  {{ "%.1f"|format(r2 * 100) }}% da variação de {{ var_y }} é explicada linearmente por {{ var_x }}.
+  {{ interpretacao_correlacao }}</p>
+
+  <div class="alerta">
+    ⚠️ <strong>Correlação não implica causalidade.</strong> Um valor alto de r ou R² mostra
+    associação estatística entre {{ var_x }} e {{ var_y }}, não que uma causa a outra — pode
+    haver variáveis de confusão, coincidência ou uma relação inversa à imaginada.
+  </div>
+
+  <h2>Predição interativa</h2>
+  <form class="form-controles" method="get">
+    <input type="hidden" name="var_x" value="{{ var_x }}">
+    <input type="hidden" name="var_y" value="{{ var_y }}">
+    <div><label for="x_predito">Valor de {{ var_x }} (X)</label>
+      <input type="number" step="any" id="x_predito" name="x_predito" value="{{ x_predito_raw }}" placeholder="Digite um valor de X"></div>
+    <button type="submit">Prever Ŷ</button>
+  </form>
+  {% if y_predito is not none %}
+  <div class="stat-tile" style="max-width:320px;">
+    <div class="rotulo">Ŷ previsto para X = {{ x_predito_raw }}</div>
+    <div class="valor">{{ "%.4f"|format(y_predito) }}</div>
+  </div>
+  {% endif %}
+</div>
+{% endif %}
+{% endblock %}
