@@ -16,11 +16,14 @@ Trabalho desenvolvido individualmente.
 
 ## 📦 Dataset
 
-- **Nome:** _(preencher após definição final do dataset)_
-- **Fonte original:** _(link)_
-- **Registros / variáveis:** _(preencher)_
+- **Nome:** Video Game Sales
+- **Fonte original:** https://www.kaggle.com/datasets/gregorut/videogamesales
+- **Registros:** 16.598 jogos (1980–2020)
+- **Variáveis numéricas (6):** Year, NA_Sales, EU_Sales, JP_Sales, Other_Sales, Global_Sales
+- **Variáveis categóricas (3):** Platform, Genre, Publisher
 
-Mais detalhes sobre a escolha e justificativa do dataset estão em [`RELATORIO.md`](RELATORIO.md).
+Mais detalhes sobre a escolha, justificativa e tratamento do dataset estão em
+[`RELATORIO.md`](RELATORIO.md) e [`data/FONTE.md`](data/FONTE.md).
 
 ## 🧠 Estrutura do projeto
 
@@ -94,7 +97,19 @@ puro: `python3 tests/test_minhastats.py`.
 
 ## 📸 Capturas de tela
 
-_(inseridas após a versão final com o dataset definitivo — ver pasta `docs/screenshots/`)_
+| Visão geral | Estatística Descritiva |
+|---|---|
+| ![Visão geral](docs/screenshots/01_visao_geral.png) | ![Descritiva](docs/screenshots/02_descritiva_numerica.png) |
+
+| Simulação (Monte Carlo) | Distribuições Teóricas |
+|---|---|
+| ![Simulação](docs/screenshots/04_simulacao.png) | ![Distribuições](docs/screenshots/05_distribuicoes.png) |
+
+| Correlação e Regressão |
+|---|
+| ![Regressão](docs/screenshots/06_regressao.png) |
+
+Mais capturas (incluindo a versão categórica do Módulo 2) estão em `docs/screenshots/`.
 
 ## 🔬 Regra de ouro seguida no projeto
 

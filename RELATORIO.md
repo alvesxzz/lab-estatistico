@@ -4,9 +4,20 @@
 
 ## 1. Dataset escolhido e justificativa
 
-_(seção a finalizar após a definição do dataset — ver `data/FONTE.md` para o link
-da fonte original. Justificativa considerará: tema, nº de registros, nº de
-variáveis numéricas/categóricas e relevância para os módulos pedidos.)_
+**Dataset:** [Video Game Sales](https://www.kaggle.com/datasets/gregorut/videogamesales)
+(Kaggle, autor: Gregory Smith, dados compilados a partir do site VGChartz).
+
+**Justificativa:** o dataset traz 16.598 jogos lançados entre 1980 e 2020, muito acima do
+mínimo de 1.000 registros exigido. Ele possui 6 variáveis numéricas relevantes (`Year` e as
+vendas em milhões de unidades por região — `NA_Sales`, `EU_Sales`, `JP_Sales`, `Other_Sales`
+— além de `Global_Sales`) e 3 variáveis categóricas (`Platform`, `Genre`, `Publisher`),
+superando os mínimos de 4 e 2 respectivamente exigidos pelo enunciado. Além disso, é um tema
+(jogos eletrônicos) que se presta bem aos módulos pedidos: a forte assimetria das vendas
+(poucos "blockbusters" dominando o mercado) é um caso de uso natural para a regra do IQR, para
+comparação com distribuições teóricas (Normal vs. Exponencial) e para a Lei dos Grandes
+Números/TCL sobre uma variável real. As colunas `Rank` (índice de 1 a 16.598) e `Name`
+(identificador quase único por linha) foram excluídas das análises por serem, na prática,
+identificadores e não variáveis estatísticas — ver `data/FONTE.md` para mais detalhes.
 
 ## 2. Núcleo estatístico — fórmulas utilizadas
 
@@ -121,27 +132,87 @@ da operação). Resultado da última execução:
 
 ## 4. Prints e explicação de cada módulo
 
-_(seção a finalizar com capturas de tela reais após a definição do dataset —
-ver pasta `docs/screenshots/`)_
+Capturas de tela completas estão em `docs/screenshots/`.
 
 ### Módulo 2 — Estatística Descritiva
-_(descrição + prints)_
+
+![Descritiva numérica](docs/screenshots/02_descritiva_numerica.png)
+
+Para `Global_Sales`: média = 0.5374, mediana = 0.17, desvio padrão amostral = 1.5550,
+CV = 289.34%, Q1/Q2/Q3 = 0.06/0.17/0.47, IQR = 0.41. A regra do IQR classifica 1.893
+observações (11.40%) como outliers — coerente com o coeficiente de assimetria de 17.4,
+que indica uma distribuição extremamente assimétrica à direita. O histograma reflete bem
+esse comportamento: praticamente toda a massa de dados fica concentrada perto de zero, com
+uma cauda longa puxada por poucos "blockbusters" (Wii Sports, Super Mario Bros., Mario Kart
+Wii...). O boxplot torna esse formato ainda mais evidente.
+
+![Descritiva categórica](docs/screenshots/03_descritiva_categorica.png)
+
+Para `Genre`: 12 categorias distintas, "Action" é a mais frequente (19.98% dos títulos),
+seguida de "Sports" (14.13%).
 
 ### Módulo 3 — Probabilidade e Simulação
-_(descrição + prints)_
+
+![Simulação](docs/screenshots/04_simulacao.png)
+
+**(a) Lei dos Grandes Números:** simulando lançamentos de moeda (p=0.5), a frequência
+relativa observada oscila bastante nas primeiras dezenas de lançamentos e se estabiliza
+perto de 0.5 conforme n cresce — demonstração direta da LGN.
+
+**(b) Teorema Central do Limite:** sorteando amostras de tamanho 50 da variável
+`Global_Sales` (que, como visto no Módulo 2, é fortemente assimétrica — está longe de ser
+Normal), a distribuição das 2.000 médias amostrais simuladas já se aproxima visivelmente de
+uma curva Normal, com desvio padrão das médias simuladas muito próximo do erro padrão
+teórico (σ/√n). Isso ilustra o TCL: mesmo a partir de uma população extremamente assimétrica,
+a distribuição das médias amostrais tende à normalidade conforme o tamanho da amostra cresce.
 
 ### Módulo 4 — Distribuições Teóricas
-_(descrição + prints)_
+
+![Distribuições](docs/screenshots/05_distribuicoes.png)
+
+Para `JP_Sales` (fortemente concentrada perto de zero, com poucos valores altos), a curva
+Exponencial (λ = 1/x̄ ≈ 12.86) acompanha visualmente muito melhor o formato dos dados do que
+a Normal ajustada — que, por ser simétrica, não consegue capturar a concentração de valores
+próximos de zero nem a cauda longa à direita. Esse é um exemplo direto de como a natureza da
+variável (tempos/valores não-negativos, fortemente assimétricos) orienta a escolha da
+distribuição candidata.
 
 ### Módulo 5 — Correlação e Regressão
-_(descrição + prints)_
+
+![Regressão](docs/screenshots/06_regressao.png)
+
+Para `NA_Sales` (X) vs. `Global_Sales` (Y): r = 0.9410, R² = 0.8856, reta ajustada
+ŷ = 0.0632 + 1.7918·x. O mercado norte-americano por si só explica cerca de 88.6% da
+variação nas vendas globais — a correlação mais forte entre todas as vendas regionais
+testadas (ver Descoberta 2 abaixo).
 
 ## 5. Descobertas (Módulo 6)
 
-_(as três descobertas estatísticas mais interessantes serão documentadas aqui,
-sustentadas pelos números e gráficos gerados pela própria aplicação, assim que o
-dataset definitivo for carregado.)_
+1. **Mercado de "blockbusters":** as vendas globais (`Global_Sales`) são extremamente
+   assimétricas à direita (coeficiente de assimetria = 17.4). A média (0.537 milhões de
+   cópias) é mais de 3× a mediana (0.17 milhões), e a regra do IQR classifica 11.4% dos
+   16.598 jogos como "outliers" — na prática, isso significa que uma minoria de títulos
+   (Wii Sports, Super Mario Bros., Mario Kart Wii, Wii Sports Resort, Pokémon Red/Blue...)
+   concentra uma fatia desproporcional das vendas totais do mercado, enquanto a maioria dos
+   jogos vende relativamente pouco.
 
-1. _Descoberta 1 — a preencher_
-2. _Descoberta 2 — a preencher_
-3. _Descoberta 3 — a preencher_
+2. **América do Norte é o melhor "termômetro" do sucesso global — o Japão marcha à parte:**
+   comparando a correlação de cada mercado regional com `Global_Sales`, `NA_Sales` tem a
+   correlação mais forte (r = 0.941, R² = 0.886), seguida de `EU_Sales` (r = 0.903,
+   R² = 0.815) e `Other_Sales` (r = 0.748, R² = 0.560). `JP_Sales` tem, disparadamente, a
+   correlação mais fraca (r = 0.612, R² = 0.374) — ou seja, o desempenho de um jogo no Japão
+   é o que menos se alinha com seu desempenho mundial, um indício de que o mercado japonês
+   tem preferências de consumo mais particulares (forte presença de RPGs e franquias
+   locais) do que os demais mercados.
+
+3. **Quantidade não é qualidade — de vendas:** o gênero "Action" é o mais produzido
+   (3.316 títulos, 19.98% do catálogo), mas tem vendas médias por título de apenas 0.528
+   milhões de cópias. Já o gênero "Platform", com menos de um terço dos lançamentos (886
+   títulos, 5.34%), tem a maior média de vendas por título entre os gêneros populares
+   (0.938 milhões) — cerca de 1.78× a média de "Action". Isso sugere que os gêneros
+   mais saturados em quantidade de lançamentos não são necessariamente os que mais vendem
+   por título, possivelmente refletindo tanto a qualidade/força das franquias de plataforma
+   (Mario, Sonic) quanto a maior concorrência dentro do gênero Action.
+
+*(Números recalculados diretamente pela aplicação a partir de `core/minhastats.py` — ver
+Módulos 2 e 5 nas capturas de tela acima.)*
