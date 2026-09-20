@@ -54,15 +54,31 @@ def _estilo_eixo(ax, titulo, xlabel="", ylabel=""):
 
 
 def histograma(valores: list, titulo: str, coluna: str, n_classes: int | None = None,
-               outliers: list | None = None) -> str:
+               limite_inferior: float | None = None,
+               limite_superior: float | None = None) -> str:
+    """Histograma com, no máximo, duas linhas tracejadas marcando os limites
+    da regra do IQR (não uma linha por outlier individual — com variáveis
+    muito assimétricas pode haver milhares de outliers, e desenhar uma linha
+    por valor deixaria o gráfico ilegível)."""
     from .data_loader import numero_classes_sturges
     k = n_classes or numero_classes_sturges(len(valores))
     fig, ax = plt.subplots(figsize=(6.4, 4.2))
     ax.hist(valores, bins=k, color=COR_PRIMARIA, edgecolor="white", zorder=3)
-    if outliers:
-        for v in set(outliers):
-            ax.axvline(v, color=COR_OUTLIER, linestyle="--", linewidth=1, alpha=0.6, zorder=4)
+
+    minimo, maximo = min(valores), max(valores)
+    limite_desenhado = False
+    if limite_superior is not None and minimo < limite_superior < maximo:
+        ax.axvline(limite_superior, color=COR_OUTLIER, linestyle="--", linewidth=1.6,
+                    zorder=4, label="Limite do IQR (outliers)")
+        limite_desenhado = True
+    if limite_inferior is not None and minimo < limite_inferior < maximo:
+        ax.axvline(limite_inferior, color=COR_OUTLIER, linestyle="--", linewidth=1.6, zorder=4,
+                    label=None if limite_desenhado else "Limite do IQR (outliers)")
+        limite_desenhado = True
+
     _estilo_eixo(ax, titulo, xlabel=coluna, ylabel="Frequência")
+    if limite_desenhado:
+        ax.legend(fontsize=9, frameon=False)
     return _fig_para_base64(fig)
 
 

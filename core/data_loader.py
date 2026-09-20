@@ -27,15 +27,33 @@ def carregar_dataset(caminho: str = CAMINHO_DATASET) -> pd.DataFrame:
     return df
 
 
+LIMIAR_CARDINALIDADE_ID = 0.5  # colunas com mais de 50% de valores únicos são
+                                # tratadas como identificadores (ex.: Rank, Name)
+                                # e ficam de fora das listas de análise, pois não
+                                # são variáveis estatísticas de verdade.
+
+
+def _e_coluna_identificadora(df: pd.DataFrame, coluna: str) -> bool:
+    n = len(df)
+    if n == 0:
+        return False
+    return (df[coluna].nunique() / n) > LIMIAR_CARDINALIDADE_ID
+
+
 def colunas_numericas(df: pd.DataFrame) -> list:
-    """Retorna os nomes das colunas numéricas (int/float) do DataFrame."""
-    return [c for c in df.columns if pd.api.types.is_numeric_dtype(df[c])]
+    """Retorna os nomes das colunas numéricas (int/float) do DataFrame,
+    excluindo colunas identificadoras (ex.: uma coluna 'Rank' que é apenas
+    um índice de 1 a n, sem significado estatístico como variável)."""
+    return [c for c in df.columns
+            if pd.api.types.is_numeric_dtype(df[c]) and not _e_coluna_identificadora(df, c)]
 
 
 def colunas_categoricas(df: pd.DataFrame) -> list:
-    """Retorna os nomes das colunas categóricas (texto/objeto/categoria)."""
+    """Retorna os nomes das colunas categóricas (texto/objeto/categoria),
+    excluindo colunas identificadoras (ex.: um nome único por linha, que
+    funciona como ID e não como categoria)."""
     return [c for c in df.columns
-            if not pd.api.types.is_numeric_dtype(df[c])]
+            if not pd.api.types.is_numeric_dtype(df[c]) and not _e_coluna_identificadora(df, c)]
 
 
 def serie_numerica_limpa(df: pd.DataFrame, coluna: str) -> list:

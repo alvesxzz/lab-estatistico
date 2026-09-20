@@ -102,13 +102,14 @@ def descritiva():
             "estatisticas": estatisticas,
             "tabela_frequencias": dl.tabela_frequencias_numerica(valores),
             "qtd_outliers": len(outliers),
-            "outliers_exemplos": sorted(outliers)[:15],
+            "outliers_exemplos": sorted(outliers, key=abs, reverse=True)[:15],
             "limite_inferior": lim_inf,
             "limite_superior": lim_sup,
             "interpretacao_assimetria": dl.interpretar_assimetria(skew),
             "interpretacao_outliers": dl.interpretar_outliers(len(outliers), len(valores)),
             "grafico_histograma": gf.histograma(valores, f"Histograma — {coluna}", coluna,
-                                                 outliers=outliers),
+                                                 limite_inferior=lim_inf,
+                                                 limite_superior=lim_sup),
             "grafico_boxplot": gf.boxplot(valores, f"Boxplot — {coluna}", coluna),
         })
     else:
