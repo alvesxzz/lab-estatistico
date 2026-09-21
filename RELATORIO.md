@@ -1,6 +1,6 @@
 # Relatório — Laboratório Estatístico Interativo
 
-**Autor:** Andrey Alves Monteiro — matrícula 261027294
+**Autor:** Andrey Alves Monteiro — matrícula 72650501
 
 ## 1. Dataset escolhido e justificativa
 
